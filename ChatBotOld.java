@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ChatBot {
+public class ChatBotOld {
 
 
 	static List<Subscriber> subs = new ArrayList<>();
