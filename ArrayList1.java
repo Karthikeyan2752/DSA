@@ -1,53 +1,150 @@
 package com.linkedlist;
 
-public class ArrayList1 {
-	private static int[] a;
-	private static int count;
-	private static int length;
+import java.util.Arrays;
+import java.util.Iterator;
+
+public class ArrayList1<T> implements Iterable<T> {
+
+	private static final int initialCapacity = 16;
+	private T[] a;
+	private int size;
+	private int capacity;
 
 	ArrayList1() {
-		a = new int[5];
-		length = 5;
-		count = 0;
+		a = (T[]) new Object[initialCapacity];
+		size = 0;
+		capacity = initialCapacity;
 	}
 
-	public static void insert(int element) {
-		if (count < a.length) {
-			a[count++] = element;
-		} else {
-			int[] b = new int[a.length + 5];
-			length += 5;
-			for (int i = 0; i < a.length; i++) {
-				b[i] = a[i];
-			}
-			b[count++] = element;
-			a = b;
+	public void add(T element) {
+		if (size == capacity) {
+			expand();
 		}
+		a[size++] = element;
 	}
 
-	public static void delete(int element) {
-		int[] b = new int[a.length];
-		int c = 0;
-		int i = 0;
-		while (i < a.length) {
+	private void expand() {
+		capacity *= 2;
+		a = Arrays.copyOf(a, capacity);
+	}
+
+	private void shrink() {
+		capacity /= 2;
+		a = Arrays.copyOf(a, capacity);
+	}
+
+	public void insert(T element, int pos) {
+		if (size == capacity) {
+			expand();
+		}
+		for (int i = size - 1; i >= pos; i--) {
+			a[i + 1] = a[i];
+		}
+		a[pos] = element;
+		size++;
+	}
+
+	public void update(T element, int pos) {
+		a[pos] = element;
+	}
+
+	public void clear() {
+		size = 0;
+	}
+
+	public boolean contains(T element) {
+		for (int i = 0; i < size; i++) {
 			if (a[i] == element) {
-				i++;
-				count--;
-			} else {
-				b[c++] = a[i++];
+				return true;
 			}
 		}
-		length--;
-		a = new int[b.length];
-		a = b;
+		return false;
 	}
 
-	public static void print() {
-		System.out.print("[ ");
-		for (int i = 0; i < count; i++) {
-			System.out.print(a[i] + " ,");
+	public int search(T element) {
+
+		for (int i = 0; i < size; i++) {
+			if (a[i] == element) {
+				return i;
+			}
 		}
-		System.out.print(" ]");
-		System.out.println("length: " + count);
+		return -1;
+	}
+
+	public void delete(int pos) {
+
+		for (int i = pos; i < size; i++) {
+			a[i] = a[i + 1];
+		}
+		size--;
+		if (capacity > initialCapacity && capacity > size * 3) {
+			shrink();
+		}
+	}
+
+	public void addFirst(T element) {
+		insert(element, 0);
+		size++;
+	}
+
+	public void addLast(T element) {
+		insert(element, size);
+		size++;
+	}
+
+	public void deleteFirst(T element) {
+		delete(0);
+		size--;
+	}
+
+	public void deleteLast(T element) {
+		delete(size - 1);
+		size--;
+	}
+
+	public void print() {
+		for (int i = 0; i < size; i++) {
+			System.out.print(a[i] + " ");
+		}
+		System.out.println();
+	}
+
+	public int size() {
+		return size;
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+
+		return new Iterator<T>() {
+			int index = 0;
+
+			@Override
+			public T next() {
+				return a[index++];
+			}
+
+			@Override
+			public boolean hasNext() {
+				return index < size;
+			}
+		};
+	}
+
+	public T get(int pos) {
+		return a[pos];
+	}
+
+	public static void main(String[] args) {
+		ArrayList1<Integer> al = new ArrayList1<>();
+		al.add(1);
+		al.insert(1, 1);
+		al.add(12);
+		al.print();
+		Iterator<Integer> i = al.iterator();
+		while (i.hasNext()) {
+			System.out.print(i.next() + " ");
+		}
+
 	}
 }

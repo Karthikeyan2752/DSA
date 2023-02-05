@@ -7,7 +7,7 @@ import java.util.Stack;
 
 public class ChatBot {
 
-	// static ChatBot cb = new ChatBot();
+
 	static List<Subscriber> subs = new ArrayList<>();
 	static List<String> complaints = new ArrayList<>();
 	static Stack<Integer> backStack = new Stack<>();
@@ -15,19 +15,20 @@ public class ChatBot {
 	static int subId = 0;
 
 
-	static final String[] plans = { "1 month data + U/L calls - 200", "3 month data + U/L calls - 600",
+	final String[] plans = { "1 month data + U/L calls - 200", "3 month data + U/L calls - 600",
 			"annual data + U/L calls - 2000" };
 
-	public static void printPlans() {
+	public void printPlans() {
 		for (int i = 1; i <= plans.length; i++) {
 			System.out.println(i + ". " + plans[i - 1]);
 		}
 
 	}
 
-	public static void setPlan(int planChoice, Subscriber s) {
+	public void setPlan(int planChoice, Subscriber s) {
 		System.out.println("\tChoose your plan: ");
-		s.pushInStack("slected plan - " + planChoice);
+		s.add("slected plan - " + planChoice);
+
 		if (planChoice == 1) {
 			s.setPlan(plans[0]);
 			s.setStatus("active");
@@ -42,7 +43,8 @@ public class ChatBot {
 		}
 	}
 
-	public static void createNewUser() {
+	public void createNewUser(ChatBot chatBot) {
+
 		System.out.println("\tNew User Portal");
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter your name: \n");
@@ -52,17 +54,19 @@ public class ChatBot {
 		Subscriber s = new Subscriber(subId++, aadhaar, name, mobile++);
 
 		System.out.println("select your plan!\n");
-		printPlans();
+		chatBot.printPlans();
 		int planChoice = sc.nextInt();
-		setPlan(planChoice, s);
+		chatBot.setPlan(planChoice, s);
 
 		System.out.println("your details: \n");
 		System.out.println(s.toString());
-		s.pushInStack("given details - " + s.toString());
+		s.add("given details - " + s.toString());
 		subs.add(s);
+
 	}
 
-	public static void report() {
+	public void report() {
+
 		System.out.println("\tReport your problem");
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter your ID: ");
@@ -70,30 +74,36 @@ public class ChatBot {
 		Subscriber temp3 = subs.get(id3);
 		System.out.println("Write your problem here: ");
 		String complaint = sc.next();
-		temp3.pushInStack("reported a problem - " + complaint);
+		temp3.add("reported a problem - " + complaint);
 		complaints.add("id - " + id3 + ": " + complaint);
 		System.out.println("we will solve your problem as soon as possible!");
+
 	}
 
-	public static void planChange() {
+	public void planChange(ChatBot chatBot) {
+
 		System.out.println("\tChange your existing plan");
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter your ID: ");
 		int id = sc.nextInt();
+
 		if (id >= subs.size()) {
 			System.out.println("id not found! ");
 			return;
 		}
+
 		Subscriber temp = subs.get(id);
 		System.out.println("select your plan!\n");
-		printPlans();
+		chatBot.printPlans();
 		int pc = sc.nextInt();
-		temp.pushInStack("changed your plan to " + pc);
-		setPlan(pc, temp);
+		temp.add("changed your plan to " + pc);
+		chatBot.setPlan(pc, temp);
 		System.out.println("plan changed successfully!");
+
 	}
 
-	public static void deactivate() {
+	public void deactivate() {
+
 		System.out.println("\tDecativation portal");
 		Scanner sc = new Scanner(System.in);
 		System.out.println("enter your ID: ");
@@ -101,85 +111,104 @@ public class ChatBot {
 		Subscriber temp7 = subs.get(id7);
 		temp7.setStatus("inactive");
 		System.out.println("deactivated!..");
+
 	}
 
-	public static void history() {
+	public void history() {
+
 		System.out.println("\tHistory Portal");
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter your ID: ");
 		int id5 = sc.nextInt();
+
+		if (id5 >= subs.size()) {
+			System.out.println("id not found! ");
+			return;
+		}
+
 		Subscriber temp5 = subs.get(id5);
-		while (!temp5.chats.isEmpty()) {
-			System.out.println(temp5.chats.pop());
+
+		for (String str : temp5.chats) {
 			System.out.println("-------------------------------");
+			System.out.println(str);
 		}
 	}
 
-	public static void mainMenu() {
+	public void mainMenu(ChatBot chatBot) {
+
 		System.out.println("\tMain Menu");
 		System.out.println("1. Available Offer Plans! \n2. new user "
-				+ "\n3. Report network issues \n4.Change plans \n5. chat history \n6. Exit\n7. decativate your account\n");
-		stackUtil();
+				+ "\n3. Report network issues \n4. Change plans \n5. chat history \n6. Exit\n7. decativate your account\n");
+		chatBot.stackUtil(chatBot);
+
 	}
 
-	public static void stackUtil() {
+	public void stackUtil(ChatBot chatBot) {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("press '0' to main menu\npress '9' to back\npress '6' to exit");
 		int choice = sc.nextInt();
-		start(choice);
+		chatBot.start(choice, chatBot);
 	}
 
-	public static void start(int choice) {
+	public void start(int choice, ChatBot chatBot) {
 		backStack.push(choice);
 
-		while (choice != 6) {
+		while (choice != -1) {
 
 			switch (choice) {
 			case 0:
 				backStack.push(0);
-				mainMenu();
+				chatBot.mainMenu(chatBot);
 				break;
 
 			case 1:
 				backStack.push(1);
-				printPlans();
-				stackUtil();
+				chatBot.printPlans();
+				chatBot.stackUtil(chatBot);
 				break;
 
 			case 2:
 				backStack.push(2);
-				createNewUser();
-				stackUtil();
+				chatBot.createNewUser(chatBot);
+				chatBot.stackUtil(chatBot);
 				break;
 
 			case 3:
 				backStack.push(3);
-				report();
-				stackUtil();
+				chatBot.report();
+				chatBot.stackUtil(chatBot);
 				break;
 
 			case 4:
 				backStack.push(4);
-				planChange();
-				stackUtil();
+				chatBot.planChange(chatBot);
+				chatBot.stackUtil(chatBot);
 				break;
 
 			case 5:
 				backStack.push(5);
-				history();
-				stackUtil();
+				chatBot.history();
+				chatBot.stackUtil(chatBot);
 				break;
 
+			case 6:
+				System.out.println("Are you sure, you want to exit? ");
+				System.out.println("Enter 0 to exit/nEnter 1 to continue");
+				Scanner sc = new Scanner(System.in);
+				int exitChoice = sc.nextInt();
+				if (exitChoice == 0) {
+
+				}
 			case 7:
 				backStack.push(7);
-				deactivate();
-				stackUtil();
+				chatBot.deactivate();
+				chatBot.stackUtil(chatBot);
 				break;
 
 			case 9:
 				if (!backStack.isEmpty()) {
 					backStack.pop();
-					start(backStack.peek());
+					chatBot.start(backStack.peek(), chatBot);
 					break;
 				}
 			}
@@ -188,9 +217,10 @@ public class ChatBot {
 	}
 
 	public static void main(String[] args) {
-		mainMenu();
+		ChatBot chatBot = new ChatBot();
+		chatBot.mainMenu(chatBot);
 		Scanner sc = new Scanner(System.in);
 		int choice = sc.nextInt();
-		start(choice);
+		chatBot.start(choice, chatBot);
 	}
 }
